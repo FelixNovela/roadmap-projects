@@ -1,6 +1,6 @@
 
 const taskList = []
-
+const statusTask = ["to do","in progress","done"]
 const generateId = () => {
     let currentId = 1
     if (taskList.length > 0) {
@@ -27,7 +27,7 @@ const add = (taskDescription) => {
     task = {
         id: generateId(),
         description: taskDescription,
-        status: "todo",
+        status: statusTask[0],
         createdAt: new Date(),
         updatedAt: new Date()
     }
@@ -48,6 +48,23 @@ const updateTask = (taskId, newTaskDescription) => {
         taskList[index].updatedAt = new Date()
     }
 }
+
+const markInProgress = (taskId) => {
+    let index = findTask(taskId)
+    if (index !== -1) {
+        taskList[index].status = statusTask[1]
+        taskList[index].updatedAt = new Date()
+    }
+}
+
+const markDone = (taskId) => {
+    let index = findTask(taskId)
+    if (index !== -1) {
+        taskList[index].status = statusTask[2]
+        taskList[index].updatedAt = new Date()
+    }
+}
+
 const list = () => {
     taskList.forEach(element => {
         console.log(" id", element.id, "\n",
@@ -67,4 +84,7 @@ add("Task 3")
 list()
 updateTask(3,"Task Atualizada")
 list()
-
+markDone(2)
+list()
+markInProgress(3)
+list()
