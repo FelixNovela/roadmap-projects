@@ -1,20 +1,24 @@
 
-const taskList = []
-const statusTask = ["to do","in progress","done"]
-const generateId = () => {
+import fs from 'fs'
+
+const myTasksJson = 'myTasks.json'
+
+
+const statusTask = ["todo","in progress","done"]
+const generateId = (myTasks) => {
     let currentId = 1
-    if (taskList.length > 0) {
-        currentId = taskList.at(-1).id + 1
+    if (myTasks.length > 0) {
+        currentId = myTasks.at(-1).id + 1
         return currentId
     }
     return currentId
 
 }
 
-const findTask = (taskId) => {
-    if (taskList.length > 0) {
-        for (let i = 0; i < taskList.length; i++) {
-            if (taskList[i].id === taskId) {
+const findTask = (myTasks,taskId) => {
+    if (myTasks.length > 0) {
+        for (let i = 0; i < myTasks.length; i++) {
+            if (myTasks[i].id === taskId) {
                 return i
                 
             }
@@ -23,50 +27,84 @@ const findTask = (taskId) => {
     return -1
 }
 
+const readTasksData = () => {
+
+    if (!fs.existsSync(myTasksJson)) {
+        return [];
+    }
+    
+    const myTasksText = fs.readFileSync(myTasksJson, 'utf-8');
+    
+    return JSON.parse(myTasksText);
+}
+
+const saveTasksData = (myTasks) => {
+
+    const jsonText = JSON.stringify(myTasks, null, 2);
+    
+    fs.writeFileSync(myTasksJson, jsonText, 'utf-8');
+    
+}
+
 const add = (taskDescription) => {
-    task = {
-        id: generateId(),
+    
+    let myTasks = readTasksData()
+    let task = {
+        id: generateId(myTasks),
         description: taskDescription,
         status: statusTask[0],
         createdAt: new Date(),
         updatedAt: new Date()
     }
-    taskList.push(task)
+    myTasks.push(task)
+    saveTasksData(myTasks)
+    
 }
 
 const deleteTask = (taskId) => {
-    let index = findTask(taskId)
+    let myTasks = readTasksData()
+    let index = findTask(myTasks,taskId)
+   
     if (index !== -1) {
-        taskList.splice(index,1)
+        myTasks.splice(index,1)
+        saveTasksData(myTasks)
     }
 }
 
 const updateTask = (taskId, newTaskDescription) => {
-    let index = findTask(taskId)
+    let myTasks = readTasksData()
+    let index = findTask(myTasks, taskId)
     if (index !== -1) {
-        taskList[index].description = newTaskDescription
-        taskList[index].updatedAt = new Date()
+        myTasks[index].description = newTaskDescription
+        myTasks[index].updatedAt = new Date()
+        saveTasksData(myTasks)
     }
 }
 
 const markInProgress = (taskId) => {
-    let index = findTask(taskId)
+    let myTasks = readTasksData()
+    let index = findTask(myTasks, taskId)
     if (index !== -1) {
-        taskList[index].status = statusTask[1]
-        taskList[index].updatedAt = new Date()
+        myTasks[index].status = statusTask[1]
+        myTasks[index].updatedAt = new Date()
+        saveTasksData(myTasks)
     }
 }
 
 const markDone = (taskId) => {
-    let index = findTask(taskId)
+    let myTasks = readTasksData()
+    let index = findTask(myTasks, taskId)
     if (index !== -1) {
-        taskList[index].status = statusTask[2]
-        taskList[index].updatedAt = new Date()
+        myTasks[index].status = statusTask[2]
+        myTasks[index].updatedAt = new Date()
+        saveTasksData(myTasks)
+
     }
 }
 
 const list = () => {
-    taskList.forEach(element => {
+    let myTasks = readTasksData()
+    myTasks.forEach(element => {
         console.log(" id", element.id, "\n",
             "description:", element.description, "\n",
             "Status: ", element.status, "\n",
@@ -75,16 +113,28 @@ const list = () => {
         )
     });
 }
-add("Task 1")
+const args = process.argv.slice(2)
+const command = args[0]
 
-add("Task 2")
-
-add("Task 3")
-
-list()
-updateTask(3,"Task Atualizada")
-list()
-markDone(2)
-list()
-markInProgress(3)
-list()
+switch (command) {
+    case "add":
+        add(args[1])
+        break
+    case "delete":
+        deleteTask(Number(args[1]))
+        break
+    case "update":
+        updateTask(Number(args[1]), args[2])
+        break
+    case "mark-in-progress":
+        markInProgress(Number(args[1]))
+        break
+    case "mark-done":
+        markDone(Number(args[1]))
+        break
+    case "list":
+        list()
+        break
+    default:
+        console.log("Unknown command:", command)
+}
