@@ -4,7 +4,7 @@ import fs from 'fs'
 const myTasksJson = 'myTasks.json'
 
 
-const statusTask = ["todo","in progress","done"]
+const statusTask = ["todo", "in-progress", "done"]
 const generateId = (myTasks) => {
     let currentId = 1
     if (myTasks.length > 0) {
@@ -15,14 +15,14 @@ const generateId = (myTasks) => {
 
 }
 
-const findTask = (myTasks,taskId) => {
+const findTask = (myTasks, taskId) => {
     if (myTasks.length > 0) {
         for (let i = 0; i < myTasks.length; i++) {
             if (myTasks[i].id === taskId) {
                 return i
-                
+
             }
-        } 
+        }
     }
     return -1
 }
@@ -32,42 +32,51 @@ const readTasksData = () => {
     if (!fs.existsSync(myTasksJson)) {
         return [];
     }
-    
+
     const myTasksText = fs.readFileSync(myTasksJson, 'utf-8');
-    
+
     return JSON.parse(myTasksText);
 }
+
+
+
 
 const saveTasksData = (myTasks) => {
 
     const jsonText = JSON.stringify(myTasks, null, 2);
-    
+
     fs.writeFileSync(myTasksJson, jsonText, 'utf-8');
-    
+
 }
 
 const add = (taskDescription) => {
-    
     let myTasks = readTasksData()
-    let task = {
-        id: generateId(myTasks),
-        description: taskDescription,
-        status: statusTask[0],
-        createdAt: new Date(),
-        updatedAt: new Date()
+    if (taskDescription) {
+        let task = {
+            id: generateId(myTasks),
+            description: taskDescription,
+            status: statusTask[0],
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }
+        myTasks.push(task)
+        saveTasksData(myTasks)
+    } else {
+        console.log("Invalid input!")
     }
-    myTasks.push(task)
-    saveTasksData(myTasks)
-    
+
+
 }
 
 const deleteTask = (taskId) => {
     let myTasks = readTasksData()
-    let index = findTask(myTasks,taskId)
-   
+    let index = findTask(myTasks, taskId)
+
     if (index !== -1) {
-        myTasks.splice(index,1)
+        myTasks.splice(index, 1)
         saveTasksData(myTasks)
+    } else {
+        console.log("Task not found")
     }
 }
 
@@ -75,9 +84,16 @@ const updateTask = (taskId, newTaskDescription) => {
     let myTasks = readTasksData()
     let index = findTask(myTasks, taskId)
     if (index !== -1) {
-        myTasks[index].description = newTaskDescription
-        myTasks[index].updatedAt = new Date()
-        saveTasksData(myTasks)
+        if (newTaskDescription) {
+            myTasks[index].description = newTaskDescription
+            myTasks[index].updatedAt = new Date()
+            saveTasksData(myTasks)
+        }else{
+            console.log("New description is required")
+        }
+
+    } else {
+        console.log("Task not found")
     }
 }
 
@@ -88,6 +104,8 @@ const markInProgress = (taskId) => {
         myTasks[index].status = statusTask[1]
         myTasks[index].updatedAt = new Date()
         saveTasksData(myTasks)
+    } else {
+        console.log("Task not found")
     }
 }
 
@@ -99,12 +117,16 @@ const markDone = (taskId) => {
         myTasks[index].updatedAt = new Date()
         saveTasksData(myTasks)
 
+    } else {
+        console.log("Task not found")
     }
 }
 
-const list = () => {
+const list = (status) => {
     let myTasks = readTasksData()
-    myTasks.forEach(element => {
+    let tasksList = status ? myTasks.filter(task => task.status === status) : myTasks
+
+    tasksList.forEach(element => {
         console.log(" id", element.id, "\n",
             "description:", element.description, "\n",
             "Status: ", element.status, "\n",
@@ -133,7 +155,7 @@ switch (command) {
         markDone(Number(args[1]))
         break
     case "list":
-        list()
+        list((args[1]))
         break
     default:
         console.log("Unknown command:", command)
