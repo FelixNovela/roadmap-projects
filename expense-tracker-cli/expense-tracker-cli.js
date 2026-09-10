@@ -42,12 +42,29 @@ const list = () => {
     let myExpensesData = readEspensesData()
     myExpensesData.forEach(element => {
         console.log(" id", element.id, "\n",
-            "date: ",element.date,
+            "date: ",element.date,"\n",
             "description:", element.description, "\n",
            
             "amount: ", element.amount, "\n",
         )
     });
+}
+const findExpense = (expenseId, myEspenseData) => {
+    return myEspenseData.find(expense => expense.id === expenseId)
+}
+const update = (expenseId, newDescription, newAmount) => {
+    let myExpensesData = readEspensesData()
+    let expense = findExpense(expenseId, myExpensesData)
+    expense.description = newDescription
+    expense.amount = newAmount
+    saveMyExpensesData(myExpensesData)
+    
+}
+
+const summary = () => {
+    let myExpensesData = readEspensesData()
+    let result = myExpensesData.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
+    console.log(result)
 }
 
 const args = process.argv.slice(2)
@@ -58,7 +75,13 @@ switch (command) {
         add(args[1], Number(args[2]))
         break
     case "list":
-        list((args[1]))
+        list()
+        break
+    case "update":
+        update(Number(args[1]),args[2], Number(args[3]))
+        break
+    case "summary":
+        summary()
         break
     default:
         console.log("Unknown command:", command)
