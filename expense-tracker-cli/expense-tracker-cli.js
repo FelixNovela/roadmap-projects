@@ -28,45 +28,76 @@ const generateExpenseId = (myExpensesData) => {
 }
 
 const findExpense = (expenseId, myEspenseData) => {
-    return myEspenseData.find(expense => expense.id === expenseId)
+    for (let i = 0; i < myEspenseData.length; i++) {
+        if (myEspenseData[i].id === expenseId) {
+            return i
+        }
+    }
+    return -1
 }
 
 const add = (expenseDescription, amount) => {
-    let myExpensesData = readEspensesData()
-    let expense = {
-        id: generateExpenseId(myExpensesData),
-        date: new Date(),
-        description: expenseDescription,
-        amount: amount
+    if (!expenseDescription) {
+        console.log("Description is required")
+    } else if (!amount) {
+        console.log("Amount is required")
+    } else {
+        let myExpensesData = readEspensesData()
+        let expense = {
+            id: generateExpenseId(myExpensesData),
+            date: new Date(),
+            description: expenseDescription,
+            amount: amount
+        }
+        myExpensesData.push(expense)
+        saveMyExpensesData(myExpensesData)
     }
-    myExpensesData.push(expense)
-    saveMyExpensesData(myExpensesData)
+
 }
 
 const update = (expenseId, newDescription, newAmount) => {
     let myExpensesData = readEspensesData()
-    let expense = findExpense(expenseId, myExpensesData)
-    expense.description = newDescription
-    expense.amount = newAmount
-    saveMyExpensesData(myExpensesData)
+    let index = findExpense(expenseId, myExpensesData)
+    if (index === -1) {
+        console.log(`Expense with id ${expenseId} not found!`)
+    } else if (!newDescription) {
+        console.log("New description is required")
+    } else if (!newAmount) {
+        console.log("New amount is required")
+    } else {
+        myExpensesData[index].description = newDescription
+        myExpensesData[index].amount = newAmount
+        saveMyExpensesData(myExpensesData)
+    }
 }
 
 const deleteExpense = (expenseId) => {
     let myExpensesData = readEspensesData()
-    myExpensesData.splice(myExpensesData.indexOf(findExpense(expenseId, myExpensesData)), 1)
-    saveMyExpensesData(myExpensesData)
+    let index = findExpense(expenseId, myExpensesData)
+    if (index === -1) {
+        console.log(`Expense with id ${expenseId} not found!`)
+    } else {
+        myExpensesData.splice(index, 1)
+        saveMyExpensesData(myExpensesData)
+    }
+
 }
 
 const list = () => {
     let myExpensesData = readEspensesData()
-    myExpensesData.forEach(element => {
-        console.log(" id", element.id, "\n",
-            "date: ", element.date, "\n",
-            "description:", element.description, "\n",
+    if (myExpensesData.length === 0) {
+        console.log("Doesn't have any expense saved")
+    } else {
+        myExpensesData.forEach(element => {
+            console.log(" id", element.id, "\n",
+                "date: ", element.date, "\n",
+                "description:", element.description, "\n",
 
-            "amount: ", element.amount, "\n",
-        )
-    });
+                "amount: ", element.amount, "\n",
+            )
+        });
+    }
+
 }
 
 
@@ -87,8 +118,8 @@ const summaryMonth = (month) => {
     let myExpensesData = readEspensesData()
     let monthFilter = myExpensesData.filter(monthCode => new Date(monthCode.date).getMonth() + 1 === month)
     let sum = monthFilter.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
-   
-    console.log(`Total Expense for ${months[month-1]}: ${sum}`)
+
+    console.log(`Total Expense for ${months[month - 1]}: ${sum}`)
 }
 
 const args = process.argv.slice(2)
