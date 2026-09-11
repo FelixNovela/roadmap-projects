@@ -26,6 +26,11 @@ const generateExpenseId = (myExpensesData) => {
     }
     return currentId
 }
+
+const findExpense = (expenseId, myEspenseData) => {
+    return myEspenseData.find(expense => expense.id === expenseId)
+}
+
 const add = (expenseDescription, amount) => {
     let myExpensesData = readEspensesData()
     let expense = {
@@ -38,33 +43,52 @@ const add = (expenseDescription, amount) => {
     saveMyExpensesData(myExpensesData)
 }
 
-const list = () => {
-    let myExpensesData = readEspensesData()
-    myExpensesData.forEach(element => {
-        console.log(" id", element.id, "\n",
-            "date: ",element.date,"\n",
-            "description:", element.description, "\n",
-           
-            "amount: ", element.amount, "\n",
-        )
-    });
-}
-const findExpense = (expenseId, myEspenseData) => {
-    return myEspenseData.find(expense => expense.id === expenseId)
-}
 const update = (expenseId, newDescription, newAmount) => {
     let myExpensesData = readEspensesData()
     let expense = findExpense(expenseId, myExpensesData)
     expense.description = newDescription
     expense.amount = newAmount
     saveMyExpensesData(myExpensesData)
-    
 }
+
+const deleteExpense = (expenseId) => {
+    let myExpensesData = readEspensesData()
+    myExpensesData.splice(myExpensesData.indexOf(findExpense(expenseId, myExpensesData)), 1)
+    saveMyExpensesData(myExpensesData)
+}
+
+const list = () => {
+    let myExpensesData = readEspensesData()
+    myExpensesData.forEach(element => {
+        console.log(" id", element.id, "\n",
+            "date: ", element.date, "\n",
+            "description:", element.description, "\n",
+
+            "amount: ", element.amount, "\n",
+        )
+    });
+}
+
+
+
 
 const summary = () => {
     let myExpensesData = readEspensesData()
-    let result = myExpensesData.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
-    console.log(result)
+    let sum = myExpensesData.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
+    console.log(sum)
+}
+
+const summaryMonth = (month) => {
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    let myExpensesData = readEspensesData()
+    let monthFilter = myExpensesData.filter(monthCode => new Date(monthCode.date).getMonth() + 1 === month)
+    let sum = monthFilter.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
+   
+    console.log(`Total Expense for ${months[month-1]}: ${sum}`)
 }
 
 const args = process.argv.slice(2)
@@ -74,14 +98,20 @@ switch (command) {
     case "add":
         add(args[1], Number(args[2]))
         break
+    case "delete":
+        deleteExpense(Number(args[1]))
+        break
     case "list":
         list()
         break
     case "update":
-        update(Number(args[1]),args[2], Number(args[3]))
+        update(Number(args[1]), args[2], Number(args[3]))
         break
     case "summary":
         summary()
+        break
+    case "summaryMonth":
+        summaryMonth(Number(args[1]))
         break
     default:
         console.log("Unknown command:", command)
