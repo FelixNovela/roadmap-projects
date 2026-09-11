@@ -88,13 +88,22 @@ const list = () => {
     if (myExpensesData.length === 0) {
         console.log("Doesn't have any expense saved")
     } else {
-        myExpensesData.forEach(element => {
-            console.log(" id", element.id, "\n",
-                "date: ", element.date, "\n",
-                "description:", element.description, "\n",
+        console.log("# ID  Date        Description  Amount")
 
-                "amount: ", element.amount, "\n",
-            )
+        myExpensesData.forEach(element => {
+
+            const id = `# ${element.id}`.padEnd(6)
+
+            const date = new Date(element.date)
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            const formatedDate = `${year}-${month}-${day}`
+            const desc = element.description.padEnd(13)
+            const amount = element.amount
+
+            console.log(`${id}${formatedDate.padEnd(14)}${desc}${amount}`)
+
         });
     }
 
