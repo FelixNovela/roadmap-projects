@@ -4,5 +4,6 @@ Solutions to backend projects from [roadmap.sh](https://roadmap.sh/backend).
 
 ## Projects
 
-- [Task Tracker](./task-tracker-cli)
-Project page: https://roadmap.sh/projects/task-tracker
+- [Task Tracker](./task-tracker-cli) - Project page: https://roadmap.sh/projects/task-tracker
+
+- [Expense Tracker](./expense-tracker-cli) - Project page: https://roadmap.sh/projects/expense-tracker
