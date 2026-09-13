@@ -13,9 +13,9 @@ const readEspensesData = () => {
 }
 
 const saveMyExpensesData = (expenses) => {
-    const myExpensesJsonText = JSON.stringify(expenses, null, 2);
+    const myExpensesJsonText = JSON.stringify(expenses, null, 2)
 
-    fs.writeFileSync(myExpensesJsonFile, myExpensesJsonText, 'utf-8');
+    fs.writeFileSync(myExpensesJsonFile, myExpensesJsonText, 'utf-8')
 }
 
 const generateExpenseId = (myExpensesData) => {
@@ -43,14 +43,16 @@ const add = (expenseDescription, amount) => {
         console.log("Amount is required")
     } else {
         let myExpensesData = readEspensesData()
+        let expenseId = generateExpenseId(myExpensesData)
         let expense = {
-            id: generateExpenseId(myExpensesData),
+            id: Number(expenseId),
             date: new Date(),
             description: expenseDescription,
             amount: amount
         }
         myExpensesData.push(expense)
         saveMyExpensesData(myExpensesData)
+        console.log(`Expense added successfully (ID: ${expenseId})`)
     }
 
 }
@@ -68,6 +70,7 @@ const update = (expenseId, newDescription, newAmount) => {
         myExpensesData[index].description = newDescription
         myExpensesData[index].amount = newAmount
         saveMyExpensesData(myExpensesData)
+        console.log(`Expense updated successfully`)
     }
 }
 
@@ -79,6 +82,7 @@ const deleteExpense = (expenseId) => {
     } else {
         myExpensesData.splice(index, 1)
         saveMyExpensesData(myExpensesData)
+        console.log(`Expense deleted successfully (ID: ${expenseId})`)
     }
 
 }
@@ -110,12 +114,10 @@ const list = () => {
 }
 
 
-
-
 const summary = () => {
     let myExpensesData = readEspensesData()
     let sum = myExpensesData.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
-    console.log(sum)
+    console.log(`Total expenses: \$${sum}`)
 }
 
 const summaryMonth = (month) => {
@@ -124,11 +126,17 @@ const summaryMonth = (month) => {
         "July", "August", "September", "October", "November", "December"
     ];
 
-    let myExpensesData = readEspensesData()
-    let monthFilter = myExpensesData.filter(monthCode => new Date(monthCode.date).getMonth() + 1 === month)
-    let sum = monthFilter.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
+    if (!month) {
+        console.log(`Month required`)
+    } else {
+        let myExpensesData = readEspensesData()
+        let monthFilter = myExpensesData.filter(monthCode => new Date(monthCode.date).getMonth() + 1 === month)
+        let sum = monthFilter.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0)
 
-    console.log(`Total Expense for ${months[month - 1]}: ${sum}`)
+        console.log(`Total Expenses for ${months[month - 1]}: \$${sum}`)
+    }
+
+
 }
 
 const args = process.argv.slice(2)
@@ -141,11 +149,11 @@ switch (command) {
     case "delete":
         deleteExpense(Number(args[1]))
         break
-    case "list":
-        list()
-        break
     case "update":
         update(Number(args[1]), args[2], Number(args[3]))
+        break
+    case "list":
+        list()
         break
     case "summary":
         summary()
