@@ -32,12 +32,15 @@ const numberGuess = (numberGuessed) => {
     console.log(num)
     if (numberGuessed >= 0 && numberGuessed <= 100) {
         if (num === numberGuessed) {
-            return "Congratulations! You guessed the correct number"
+            console.log("Congratulations! You guessed the correct number")
+            return 1
         } else {
             if (num > numberGuessed) {
-                return `Incorrect! The number is greater than ${numberGuessed}.`
+                console.log(`Incorrect! The number is greater than ${numberGuessed}.`)
+                return 0
             } else {
-                return `Incorrect! The number is less than ${numberGuessed}.`
+                console.log(`Incorrect! The number is less than ${numberGuessed}.`)
+                return 0
             }
         }
     }
@@ -62,7 +65,10 @@ do {
 let contador = 1
 while (contador <= chances) {
     let guess = parseInt(await rl.question('Enter your guess: '))
-    console.log(numberGuess(guess))
+    if(numberGuess(guess)){
+        console.log(`Congratulations! You guessed the correct number in ${contador} attempts.`)
+        break
+    }
     contador++
 }
 
