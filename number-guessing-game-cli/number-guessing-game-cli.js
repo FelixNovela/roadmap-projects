@@ -51,26 +51,47 @@ messageWelcome()
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 
-
-
 let chances
-do {
-    dificultyLevelOptions()
-    const choice = parseInt(await rl.question('Enter your choice: '))
+const t = async () => {
 
-    chances = options(choice)
-} while (chances === -1);
+    do {
+        dificultyLevelOptions()
+        const choice = parseInt(await rl.question('Enter your choice: '))
 
+        chances = options(choice)
+    } while (chances === -1);
+}
+
+await t()
+
+const verify = async () => {
+   
+        let tryAgain = await rl.question('Wanna try again(Y/N): ')
+        if (tryAgain.toUpperCase() === 'Y') {
+            await t()
+            contador = 1
+            num = Math.ceil(Math.random() * 100)
+        }
+    
+}
 
 let contador = 1
 while (contador <= chances) {
     let guess = parseInt(await rl.question('Enter your guess: '))
-    if(numberGuess(guess)){
+    if (numberGuess(guess)) {
         console.log(`Congratulations! You guessed the correct number in ${contador} attempts.`)
         break
     }
     contador++
+    if(contador > chances && !numberGuess(guess)){
+        await verify(guess)
+    }
+    
+
 }
+
+
+
 
 
 
