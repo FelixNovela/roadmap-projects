@@ -7,3 +7,5 @@ Solutions to backend projects from [roadmap.sh](https://roadmap.sh/backend).
 - [Task Tracker](./task-tracker-cli) - Project page: https://roadmap.sh/projects/task-tracker
 
 - [Expense Tracker](./expense-tracker-cli) - Project page: https://roadmap.sh/projects/expense-tracker
+
+- [Number Guessing Game](./number-guessing-game-cli) - Project page: https://roadmap.sh/projects/number-guessing-game
