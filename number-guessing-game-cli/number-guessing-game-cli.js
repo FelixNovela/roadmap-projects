@@ -27,72 +27,58 @@ const options = (option) => {
     }
 }
 
-let num = Math.ceil(Math.random() * 100)
-const numberGuess = (numberGuessed) => {
-    console.log(num)
-    if (numberGuessed >= 0 && numberGuessed <= 100) {
-        if (num === numberGuessed) {
-            console.log("Congratulations! You guessed the correct number")
-            return 1
-        } else {
-            if (num > numberGuessed) {
-                console.log(`Incorrect! The number is greater than ${numberGuessed}.`)
-                return 0
-            } else {
-                console.log(`Incorrect! The number is less than ${numberGuessed}.`)
-                return 0
-            }
-        }
-    }
-    return `${numberGuessed} is out of range`
-}
-messageWelcome()
-
-
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 
-let chances
-const t = async () => {
-
+const askDifficulty = async () => {
+    let chances
     do {
         dificultyLevelOptions()
         const choice = parseInt(await rl.question('Enter your choice: '))
-
         chances = options(choice)
-    } while (chances === -1);
+    } while (chances === -1)
+    return chances
 }
 
-await t()
-
-const verify = async () => {
-   
-        let tryAgain = await rl.question('Wanna try again(Y/N): ')
-        if (tryAgain.toUpperCase() === 'Y') {
-            await t()
-            contador = 1
-            num = Math.ceil(Math.random() * 100)
+const askGuess = async () => {
+    while (true) {
+        const guess = parseInt(await rl.question('Enter your guess: '))
+        if (Number.isInteger(guess) && guess >= 1 && guess <= 100) {
+            return guess
         }
-    
+        console.log("Please enter a whole number between 1 and 100.")
+    }
 }
 
-let contador = 1
-while (contador <= chances) {
-    let guess = parseInt(await rl.question('Enter your guess: '))
-    if (numberGuess(guess)) {
-        console.log(`Congratulations! You guessed the correct number in ${contador} attempts.`)
-        break
-    }
-    contador++
-    if(contador > chances && !numberGuess(guess)){
-        await verify(guess)
-    }
-    
+const playRound = async () => {
+    const secretNumber = Math.floor(Math.random() * 100) + 1
+    const chances = await askDifficulty()
+    console.log("Let's start the game!")
 
+    for (let attempt = 1; attempt <= chances; attempt++) {
+        const guess = await askGuess()
+
+        if (guess === secretNumber) {
+            console.log(`Congratulations! You guessed the correct number in ${attempt} attempts.`)
+            return
+        }
+
+        if (secretNumber > guess) {
+            console.log(`Incorrect! The number is greater than ${guess}.`)
+        } else {
+            console.log(`Incorrect! The number is less than ${guess}.`)
+        }
+    }
+
+    console.log(`You ran out of chances. The number was ${secretNumber}.`)
 }
 
+messageWelcome()
 
+let playAgain
+do {
+    await playRound()
+    const answer = await rl.question('Wanna play again (Y/N): ')
+    playAgain = answer.trim().toUpperCase() === 'Y'
+} while (playAgain)
 
-
-
-
-
+rl.close()
